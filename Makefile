@@ -17,7 +17,7 @@ cmake-release:
 	cd build/release && cmake -pthread -lpthread -pthreads -D CMAKE_BUILD_TYPE=Release ../..
 
 build-release: cmake-release
-	cd build/release && $(MAKE) -pthread -lpthread -pthreads
+	cd build/release && $(MAKE)
 
 test-release: build-release
 	cd build/release && $(MAKE) test
