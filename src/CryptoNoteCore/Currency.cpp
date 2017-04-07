@@ -96,12 +96,52 @@ bool Currency::generateGenesisBlock() {
   return true;
 }
 
+//  {
+    const size_t log_fix_precision = 20;
+    static_assert(1 <= log_fix_precision && log_fix_precision < sizeof(uint64_t) * 8 / 2 - 1, "Invalid log precision");
+
+    uint64_t log2_fix(uint64_t x)
+    {
+      assert(x != 0);
+
+      uint64_t b = UINT64_C(1) << (log_fix_precision - 1);
+      uint64_t y = 0;
+
+      while (x >= (UINT64_C(2) << log_fix_precision))
+      {
+        x >>= 1;
+        y += UINT64_C(1) << log_fix_precision;
+      }
+
+      // 64 bits are enough, because of x < 2 * (1 << log_fix_precision) <= 2^32
+      uint64_t z = x;
+      for (size_t i = 0; i < log_fix_precision; i++)
+      {
+        z = (z * z) >> log_fix_precision;
+        if (z >= (UINT64_C(2) << log_fix_precision))
+        {
+          z >>= 1;
+          y += b;
+        }
+        b >>= 1;
+      }
+
+      return y;
+    }
+ // }
+
 bool Currency::getBlockReward(size_t medianSize, size_t currentBlockSize, uint64_t alreadyGeneratedCoins,
   uint64_t fee, uint64_t& reward, int64_t& emissionChange) const {
   assert(alreadyGeneratedCoins <= m_moneySupply);
   assert(m_emissionSpeedFactor > 0 && m_emissionSpeedFactor <= 8 * sizeof(uint64_t));
 
-  uint64_t baseReward = (m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor;
+//    int64_t diff = static_cast<int64_t>(medianSize) - static_cast<int64_t>(currentBlockSize);
+//    assert(diff != 0);
+//    assert(static_cast<uint64_t>(diff) < (UINT64_C(1) << (sizeof(uint64_t) * 8 - log_fix_precision)));
+//    uint64_t baseReward = log2_fix(diff << log_fix_precision) << 20;
+
+//  uint64_t baseReward = (m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor;
+   uint64_t baseReward = log2_fix((m_moneySupply - alreadyGeneratedCoins) >> m_emissionSpeedFactor * 2);
 
   medianSize = std::max(medianSize, m_blockGrantedFullRewardZone);
   if (currentBlockSize > UINT64_C(2) * medianSize) {
