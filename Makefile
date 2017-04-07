@@ -14,10 +14,10 @@ all-debug: build-debug
 
 cmake-release:
 	mkdir -p build/release
-	cd build/release && cmake -D CMAKE_BUILD_TYPE=Release ../..
+	cd build/release && cmake -pthread -lpthread -pthreads -D CMAKE_BUILD_TYPE=Release ../..
 
 build-release: cmake-release
-	cd build/release && $(MAKE)
+	cd build/release && $(MAKE) -pthread -lpthread -pthreads
 
 test-release: build-release
 	cd build/release && $(MAKE) test
