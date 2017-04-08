@@ -135,7 +135,7 @@ bool Currency::getBlockReward(size_t medianSize, size_t currentBlockSize, uint64
   assert(alreadyGeneratedCoins <= m_moneySupply);
   assert(m_emissionSpeedFactor > 0 && m_emissionSpeedFactor <= 8 * sizeof(uint64_t));
 
-    int64_t diff = static_cast<int64_t>(m_moneySupply) - static_cast<int64_t>(alreadyGeneratedCoins);
+    int64_t diff = static_cast<int64_t>(medianSize) - static_cast<int64_t>(currentBlockSize);
     assert(diff != 0);
     assert(static_cast<uint64_t>(diff) < (UINT64_C(1) << (sizeof(uint64_t) * 8 - log_fix_precision)));
     uint64_t baseReward = log2_fix(diff << log_fix_precision) << 20;
